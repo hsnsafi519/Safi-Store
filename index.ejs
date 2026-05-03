@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-6">
+
+<h1 class="text-2xl font-bold mb-4">Safi Store</h1>
+
+<form method="GET" action="/products">
+    <input name="search" placeholder="Search..." class="border p-2">
+    <button class="bg-blue-500 text-white px-3 py-2">Search</button>
+</form>
+
+<a href="/products/create" class="bg-green-500 text-white px-3 py-2">Add Product</a>
+
+<div class="grid grid-cols-3 gap-4 mt-4">
+    <% products.forEach(p => { %>
+        <div class="border p-4">
+            <img src="/uploads/<%= p.image %>" class="h-40 w-full object-cover">
+            <h2 class="text-xl"><%= p.title %></h2>
+            <p>$<%= p.price %></p>
+
+            <a href="/products/<%= p._id %>/edit">Edit</a>
+
+            <form method="POST" action="/products/<%= p._id %>?_method=DELETE">
+                <button class="text-red-500">Delete</button>
+            </form>
+        </div>
+    <% }) %>
+</div>
+<div class="mt-4">
+    <% for(let i = 1; i <= pages; i++) { %>
+        <a href="/products?page=<%= i %>&search=<%= search %>"
+           class="px-3 py-1 border <%= current === i ? 'bg-blue-500 text-white' : '' %>">
+           <%= i %>
+        </a>
+    <% } %>
+</div>
+</body>
+</html>

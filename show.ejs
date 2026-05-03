@@ -1,0 +1,160 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-sm mb-6">
+        <a href="/products" class="text-gray-500 hover:text-safi-600 transition-colors flex items-center space-x-1">
+            <i class="fas fa-th-large"></i>
+            <span>Products</span>
+        </a>
+        <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+        <span class="text-gray-900 font-medium truncate max-w-[200px]"><%= product.title %></span>
+    </nav>
+
+    <!-- Product Card -->
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2">
+            
+            <!-- Image Section -->
+            <div class="relative bg-gradient-to-br from-gray-50 to-safi-50/30 p-6 sm:p-10 flex items-center justify-center group">
+                <div class="relative w-full max-w-md aspect-square">
+                    <% if (product.image) { %>
+                        <img src="/uploads/<%= product.image %>" alt="<%= product.title %>" 
+                             class="w-full h-full object-contain rounded-xl shadow-lg transition-all duration-500 group-hover:scale-105 group-hover:shadow-2xl">
+                    <% } else { %>
+                        <div class="w-full h-full bg-gray-100 rounded-xl flex items-center justify-center text-gray-400">
+                            <i class="fas fa-image text-5xl"></i>
+                        </div>
+                    <% } %>
+                </div>
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 rounded-xl pointer-events-none"></div>
+            </div>
+
+            <!-- Details Section -->
+            <div class="p-6 sm:p-10 lg:p-12 flex flex-col justify-center">
+                <!-- Category Badge -->
+                <div class="mb-4">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-safi-100 text-safi-700 text-xs font-semibold uppercase tracking-wide">
+                        <%= product.category %>
+                    </span>
+                </div>
+
+                <!-- Title & Price -->
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-3 leading-tight">
+                    <%= product.title %>
+                </h1>
+                
+                <div class="text-3xl font-bold text-gray-900 mb-6">
+                    $<%= Number(product.price || 0).toFixed(2) %>
+                    <span class="text-sm font-medium text-gray-400 line-through ml-2 hidden">$<%= (Number(product.price || 0) * 1.2).toFixed(2) %></span>
+                </div>
+
+                <!-- Description -->
+                <div class="prose-sm text-gray-600 leading-relaxed mb-8 whitespace-pre-line border-l-4 border-safi-200 pl-4">
+                    <%= product.description %>
+                </div>
+
+                <!-- Meta Info -->
+                <div class="grid grid-cols-2 gap-4 mb-8 text-sm">
+                    <div class="flex items-center space-x-2 text-gray-500">
+                        <i class="fas fa-box-open text-safi-500"></i>
+                        <span>SKU: <%= product._id.substring(product._id.length - 8).toUpperCase() %></span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-green-600 font-medium">
+                        <i class="fas fa-check-circle"></i>
+                        <span>In Stock</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 mt-auto pt-6 border-t border-gray-100">
+                    <a href="/products" class="px-6 py-3 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-all duration-200 text-center flex items-center justify-center space-x-2">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Back to Catalog</span>
+                    </a>
+                    
+                    <% if (typeof user !== 'undefined' && user) { %>
+                        <a href="/products/<%= product._id %>/edit" class="px-6 py-3 rounded-xl bg-gradient-to-r from-safi-500 to-safi-600 hover:from-safi-600 hover:to-safi-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 text-center flex items-center justify-center space-x-2">
+                            <i class="fas fa-pen"></i>
+                            <span>Edit Product</span>
+                        </a>
+                        
+                        <button type="button" id="deleteBtn" 
+                            class="px-6 py-3 rounded-xl border border-red-200 text-red-600 font-medium hover:bg-red-50 transition-all duration-200 text-center flex items-center justify-center space-x-2">
+                            <i class="fas fa-trash-alt"></i>
+                            <span>Delete</span>
+                        </button>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<% if (typeof user !== 'undefined' && user) { %>
+<div id="deleteModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="deleteOverlay"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all scale-95 opacity-0 transition-transform transition-opacity duration-300" id="modalContent">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Delete Product?</h3>
+            </div>
+            <p class="text-gray-600 mb-6">
+                Are you sure you want to permanently delete "<%= product.title %>"? This action cannot be undone.
+            </p>
+            <div class="flex justify-end gap-3">
+                <button id="cancelDelete" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors">
+                    Cancel
+                </button>
+                <form method="POST" action="/products/<%= product._id %>?_method=DELETE" class="inline">
+                    <button type="submit" class="px-4 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition-colors">
+                        Yes, Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<% } %>
+
+<!-- Scripts -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const deleteBtn = document.getElementById('deleteBtn');
+    const deleteModal = document.getElementById('deleteModal');
+    const deleteOverlay = document.getElementById('deleteOverlay');
+    const cancelDelete = document.getElementById('cancelDelete');
+    const modalContent = document.getElementById('modalContent');
+
+    if (deleteBtn && deleteModal) {
+        const openModal = () => {
+            deleteModal.classList.remove('hidden');
+            // Trigger reflow for animation
+            void deleteModal.offsetWidth;
+            modalContent.classList.remove('scale-95', 'opacity-0');
+            modalContent.classList.add('scale-100', 'opacity-100');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeModal = () => {
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                deleteModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        };
+
+        deleteBtn.addEventListener('click', openModal);
+        deleteOverlay.addEventListener('click', closeModal);
+        cancelDelete.addEventListener('click', closeModal);
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !deleteModal.classList.contains('hidden')) closeModal();
+        });
+    }
+});
+</script>

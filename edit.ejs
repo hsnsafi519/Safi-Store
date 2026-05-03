@@ -1,0 +1,285 @@
+<div class="max-w-3xl mx-auto">
+    <div class="glass rounded-2xl shadow-xl border border-white/20 p-6 sm:p-8">
+        <!-- Header -->
+        <div class="mb-8 pb-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-safi-500 to-safi-600 flex items-center justify-center text-white shadow-md">
+                        <i class="fas fa-pen"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900">Edit Product</h2>
+                </div>
+                <a href="/products" class="text-sm font-medium text-gray-500 hover:text-safi-600 transition-colors flex items-center space-x-1">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Products</span>
+                </a>
+            </div>
+            <p class="text-gray-500 ml-13 mt-2">Update the details for "<%= product.title %>" below.</p>
+        </div>
+
+        <!-- Form -->
+        <form method="POST" action="/products/<%= product._id %>?_method=PUT" enctype="multipart/form-data" class="space-y-6" id="editProductForm">
+            
+            <!-- Title -->
+            <div>
+                <label for="title" class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Product Title <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="title" name="title" value="<%= product.title %>" placeholder="e.g., Wireless Noise-Canceling Headphones" required maxlength="100"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400 
+                           focus:outline-none focus:ring-2 focus:ring-safi-500 focus:ring-offset-2 focus:border-transparent 
+                           transition-all duration-200 hover:border-gray-400">
+                <p class="mt-1 text-xs text-gray-400 text-right"><span id="titleCount"><%= product.title?.length || 0 %></span>/100</p>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Description <span class="text-red-500">*</span>
+                </label>
+                <textarea id="description" name="description" placeholder="Describe your product's features, benefits, and specifications..." required rows="4" maxlength="500"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400 
+                           focus:outline-none focus:ring-2 focus:ring-safi-500 focus:ring-offset-2 focus:border-transparent 
+                           transition-all duration-200 hover:border-gray-400 resize-y"><%= product.description %></textarea>
+                <p class="mt-1 text-xs text-gray-400 text-right"><span id="descCount"><%= product.description?.length || 0 %></span>/500</p>
+            </div>
+
+            <!-- Price & Category Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <!-- Price -->
+                <div>
+                    <label for="price" class="block text-sm font-medium text-gray-700 mb-1.5">
+                        Price (USD) <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">$</span>
+                        <input type="number" id="price" name="price" value="<%= product.price %>" placeholder="0.00" step="0.01" min="0.01" required
+                            class="w-full pl-8 pr-4 py-3 rounded-xl border border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400 
+                                   focus:outline-none focus:ring-2 focus:ring-safi-500 focus:ring-offset-2 focus:border-transparent 
+                                   transition-all duration-200 hover:border-gray-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                    </div>
+                </div>
+
+                <!-- Category -->
+                <div>
+                    <label for="category" class="block text-sm font-medium text-gray-700 mb-1.5">
+                        Category <span class="text-red-500">*</span>
+                    </label>
+                    <select id="category" name="category" required
+                        class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 text-gray-900 
+                               focus:outline-none focus:ring-2 focus:ring-safi-500 focus:ring-offset-2 focus:border-transparent 
+                               transition-all duration-200 hover:border-gray-400 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27none%27 viewBox=%270 0 24 24%27 stroke=%27currentColor%27%3E%3Cpath stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%272%27 d=%27M19 9l-7 7-7-7%27/%3E%3C/svg%3E')] bg-no-repeat bg-right-4 bg-center">
+                        <option value="" disabled>Select a category</option>
+                        <option value="electronics" <%= product.category === 'electronics' ? 'selected' : '' %>>Electronics</option>
+                        <option value="clothing" <%= product.category === 'clothing' ? 'selected' : '' %>>Clothing & Apparel</option>
+                        <option value="home" <%= product.category === 'home' ? 'selected' : '' %>>Home & Garden</option>
+                        <option value="beauty" <%= product.category === 'beauty' ? 'selected' : '' %>>Beauty & Personal Care</option>
+                        <option value="sports" <%= product.category === 'sports' ? 'selected' : '' %>>Sports & Outdoors</option>
+                        <option value="other" <%= product.category === 'other' ? 'selected' : '' %>>Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Current Image + Upload -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Product Image
+                </label>
+                
+                <!-- Existing Image Preview -->
+                <% if (product.image) { %>
+                    <div class="mb-4 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                        <p class="text-xs font-medium text-gray-500 mb-2">Current Image</p>
+                        <div class="flex items-center space-x-4">
+                            <img src="<%= product.image %>" alt="Current" class="w-20 h-20 rounded-lg object-cover border border-gray-200 shadow-sm">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900 truncate"><%= product.image.split('/').pop() %></p>
+                                <p class="text-xs text-gray-500">Click "Change Image" below to replace</p>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+
+                <!-- Upload Area -->
+                <div id="dropZone" class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-safi-500 hover:bg-safi-50/50 transition-all duration-200 cursor-pointer group">
+                    <input type="file" id="image" name="image" accept="image/*" class="hidden">
+                    <div id="uploadPrompt">
+                        <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-safi-100 flex items-center justify-center text-safi-600 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-cloud-upload-alt text-xl"></i>
+                        </div>
+                        <p class="text-sm text-gray-600 font-medium">Click to change image or drag & drop</p>
+                        <p class="text-xs text-gray-400 mt-1">PNG, JPG, GIF up to 10MB • Optional</p>
+                    </div>
+                    <div id="imagePreview" class="hidden">
+                        <img src="" alt="New Preview" class="mx-auto rounded-lg max-h-48 object-cover shadow-md">
+                        <button type="button" id="removeImage" class="mt-3 text-sm text-red-500 hover:text-red-700 font-medium flex items-center justify-center space-x-1">
+                            <i class="fas fa-trash"></i>
+                            <span>Remove new selection</span>
+                        </button>
+                    </div>
+                </div>
+                <% if (product.image) { %>
+                    <p class="mt-2 text-xs text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Leave blank to keep the current image
+                    </p>
+                <% } %>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-col sm:flex-row sm:justify-between gap-3 pt-4 border-t border-gray-200">
+                <!-- Delete Button (Left) -->
+                <button type="button" id="deleteBtn" 
+                    class="px-6 py-3 rounded-xl border border-red-200 text-red-600 font-medium hover:bg-red-50 transition-all duration-200 flex items-center justify-center space-x-2">
+                    <i class="fas fa-trash-alt"></i>
+                    <span>Delete Product</span>
+                </button>
+
+                <!-- Submit + Cancel (Right) -->
+                <div class="flex gap-3">
+                    <a href="/products" class="px-6 py-3 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-all duration-200 text-center">
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                        class="px-6 py-3 rounded-xl bg-gradient-to-r from-safi-500 to-safi-600 hover:from-safi-600 hover:to-safi-700 
+                               text-white font-semibold shadow-lg hover:shadow-xl 
+                               transition-all duration-300 transform hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer flex items-center justify-center space-x-2">
+                        <i class="fas fa-check"></i>
+                        <span>Update Product</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="deleteOverlay"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Delete Product?</h3>
+            </div>
+            <p class="text-gray-600 mb-6">
+                Are you sure you want to delete "<%= product.title %>"? This action cannot be undone.
+            </p>
+            <div class="flex justify-end gap-3">
+                <button id="cancelDelete" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors">
+                    Cancel
+                </button>
+                <form method="POST" action="/products/<%= product._id %>?_method=DELETE" class="inline">
+                    <button type="submit" class="px-4 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition-colors">
+                        Yes, Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Character counters
+    const titleInput = document.getElementById('title');
+    const titleCount = document.getElementById('titleCount');
+    const descInput = document.getElementById('description');
+    const descCount = document.getElementById('descCount');
+    
+    titleInput?.addEventListener('input', () => titleCount.textContent = titleInput.value.length);
+    descInput?.addEventListener('input', () => descCount.textContent = descInput.value.length);
+
+    // Image upload preview (same as create.ejs)
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('image');
+    const uploadPrompt = document.getElementById('uploadPrompt');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = imagePreview?.querySelector('img');
+    const removeBtn = document.getElementById('removeImage');
+
+    dropZone?.addEventListener('click', (e) => {
+        if (e.target !== removeBtn && !e.target.closest('#removeImage')) fileInput.click();
+    });
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone?.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+    });
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone?.addEventListener(eventName, () => dropZone.classList.add('border-safi-500', 'bg-safi-50/70'));
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone?.addEventListener(eventName, () => dropZone.classList.remove('border-safi-500', 'bg-safi-50/70'));
+    });
+
+    dropZone?.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
+        if (files.length) handleFile(files[0]);
+    });
+
+    fileInput?.addEventListener('change', (e) => {
+        if (e.target.files.length) handleFile(e.target.files[0]);
+    });
+
+    function handleFile(file) {
+        if (!file.type.startsWith('image/')) {
+            alert('Please upload an image file (PNG, JPG, GIF).');
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            alert('Image must be under 10MB.');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewImg.src = e.target.result;
+            uploadPrompt.classList.add('hidden');
+            imagePreview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    removeBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileInput.value = '';
+        previewImg.src = '';
+        imagePreview.classList.add('hidden');
+        uploadPrompt.classList.remove('hidden');
+    });
+
+    // Delete confirmation modal
+    const deleteBtn = document.getElementById('deleteBtn');
+    const deleteModal = document.getElementById('deleteModal');
+    const deleteOverlay = document.getElementById('deleteOverlay');
+    const cancelDelete = document.getElementById('cancelDelete');
+
+    deleteBtn?.addEventListener('click', () => {
+        deleteModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    });
+
+    const closeDeleteModal = () => {
+        deleteModal.classList.add('hidden');
+        document.body.style.overflow = '';
+    };
+
+    deleteOverlay?.addEventListener('click', closeDeleteModal);
+    cancelDelete?.addEventListener('click', closeDeleteModal);
+    
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !deleteModal.classList.contains('hidden')) {
+            closeDeleteModal();
+        }
+    });
+});
+</script>

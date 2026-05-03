@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safi Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        safi: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .alert-animate { animation: slideIn 0.3s ease-out; }
+        .glass { 
+            background: rgba(255, 255, 255, 0.75); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .dark .glass { 
+            background: rgba(30, 41, 59, 0.75); 
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-safi-50 via-white to-safi-50 text-gray-800 transition-colors duration-300">
+
+    <!-- Navigation -->
+    <nav class="glass sticky top-0 z-50 border-b border-white/20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <a href="/" class="flex items-center space-x-2 group">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-safi-500 to-safi-900 flex items-center justify-center text-white font-bold shadow-md group-hover:scale-105 transition-transform">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <span class="font-bold text-xl text-gray-900 group-hover:text-safi-600 transition-colors">Safi Store</span>
+                </a>
+
+                <!-- Navigation Links -->
+                <div class="flex items-center space-x-1 sm:space-x-4">
+                    <% if(user) { %>
+                        <a href="/products" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-safi-600 hover:bg-safi-50 transition-all duration-200 flex items-center space-x-1">
+                            <i class="fas fa-th-large"></i>
+                            <span>Products</span>
+                        </a>
+                        <div class="relative group">
+                            <button class="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-safi-600 hover:bg-safi-50 transition-all duration-200 flex items-center space-x-1">
+                                <i class="fas fa-user"></i>
+                                <span><%= user.username || 'Account' %></span>
+                            </button>
+                        </div>
+                        <a href="/logout" class="ml-2 px-4 py-2 rounded-lg text-sm font-medium bg-gray-900 text-white hover:bg-gray-800 shadow-md hover:shadow-lg transition-all duration-200 flex items-center space-x-1">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    <% } else { %>
+                        <a href="/login" class="px-4 py-2 rounded-lg text-sm font-medium text-safi-600 hover:text-safi-700 hover:bg-safi-50 transition-all duration-200">
+                            Sign In
+                        </a>
+                        <a href="/register" class="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-safi-500 to-safi-600 text-white hover:from-safi-600 hover:to-safi-700 shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5">
+                            Get Started
+                        </a>
+                    <% } %>
+                    
+                    <!-- Cart Icon (Placeholder) -->
+                    <button class="ml-2 p-2 rounded-full text-gray-600 hover:text-safi-600 hover:bg-safi-50 transition-all duration-200 relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <% if(typeof success !== 'undefined' && success && success.length > 0) { %>
+            <div class="alert-animate mb-4 rounded-xl border border-green-200 bg-green-50 text-green-800 px-4 py-3 flex items-start space-x-3 shadow-sm">
+                <i class="fas fa-check-circle mt-0.5 text-green-500"></i>
+                <span class="flex-1 text-sm font-medium"><%= success %></span>
+                <button onclick="this.parentElement.remove()" class="text-green-500 hover:text-green-700 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        <% } %>
+
+        <% if(typeof error !== 'undefined' && error && error.length > 0) { %>
+            <div class="alert-animate mb-4 rounded-xl border border-red-200 bg-red-50 text-red-800 px-4 py-3 flex items-start space-x-3 shadow-sm">
+                <i class="fas fa-exclamation-circle mt-0.5 text-red-500"></i>
+                <span class="flex-1 text-sm font-medium"><%= error %></span>
+                <button onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <%- body %>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-500">
+            <p>&copy; <%= new Date().getFullYear() %> Safi Store. Crafted with <i class="fas fa-heart text-red-500"></i> for exceptional shopping.</p>
+        </div>
+    </footer>
+
+    <!-- Optional: Auto-dismiss alerts after 5 seconds -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const alerts = document.querySelectorAll('.alert-animate');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-10px)';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>
